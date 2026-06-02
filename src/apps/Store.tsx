@@ -52,46 +52,6 @@ export function Store() {
           </div>
         </div>
 
-        {/* Time Packs */}
-        <div>
-          <h3 className="text-lg font-bold text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
-            <Icons.Zap className="w-5 h-5 text-yellow-500" />
-            Buy Time Packs
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {timePacks.map((pack, i) => (
-              <div
-                key={i}
-                className="bg-gray-800 rounded-xl border border-gray-700 p-5 flex flex-col hover:border-cyan-500/50 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-                    <Icons.Clock className="w-5 h-5 text-cyan-400" />
-                  </div>
-                  <div className="text-2xl font-black text-cyan-400">{pack.label}</div>
-                </div>
-                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-700">
-                  <div className="flex items-center gap-1 text-yellow-400 font-bold">
-                    <Icons.Coins className="w-4 h-4" />
-                    {pack.cost}
-                  </div>
-                  <button
-                    onClick={() => buyTimePack(pack.seconds, pack.cost)}
-                    disabled={coins < pack.cost}
-                    className={`px-5 py-2 rounded-lg font-bold text-sm transition-all ${
-                      coins >= pack.cost
-                        ? 'bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer'
-                        : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    Buy
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Game Catalog - Admin Added */}
         <div>
           <h3 className="text-lg font-bold text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
@@ -134,6 +94,46 @@ export function Store() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Time Packs */}
+        <div>
+          <h3 className="text-lg font-bold text-gray-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+            <Icons.Zap className="w-5 h-5 text-yellow-500" />
+            Buy Time Packs
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {timePacks.map((pack, i) => (
+              <div
+                key={i}
+                className="bg-gray-800 rounded-xl border border-gray-700 p-5 flex flex-col hover:border-cyan-500/50 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                    <Icons.Clock className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <div className="text-2xl font-black text-cyan-400">{pack.label}</div>
+                </div>
+                <div className="flex items-center justify-between mt-auto pt-3 border-t border-gray-700">
+                  <div className="flex items-center gap-1 text-yellow-400 font-bold">
+                    <Icons.Coins className="w-4 h-4" />
+                    {pack.cost}
+                  </div>
+                  <button
+                    onClick={() => buyTimePack(pack.seconds, pack.cost)}
+                    disabled={coins < pack.cost}
+                    className={`px-5 py-2 rounded-lg font-bold text-sm transition-all ${
+                      coins >= pack.cost
+                        ? 'bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer'
+                        : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Buy
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Earn Coins */}
