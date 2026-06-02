@@ -173,19 +173,22 @@ export function Profile() {
             </div>
 
             <div className="bg-[#1e293b] p-4 rounded-lg border border-red-500/20 mb-4 max-h-60 overflow-y-auto">
-               <h4 className="font-bold mb-3 flex items-center gap-2"><Icons.Activity className="w-4 h-4" /> Real-time Live Users List</h4>
+               <h4 className="font-bold mb-3 flex items-center gap-2"><Icons.Activity className="w-4 h-4" /> Live Active Sessions ({activeUsers.length})</h4>
                <div className="space-y-2">
-                 {activeUsers.map((u, i) => (
-                   <div key={i} className="flex items-center gap-3 bg-black/40 p-2 rounded border border-white/5">
-                     {u.photoURL ? <img src={u.photoURL} alt="" className="w-6 h-6 rounded-full" /> : <Icons.UserCircle className="w-6 h-6 text-gray-500" />}
-                     <div className="flex-1">
-                       <div className="text-sm font-bold text-white">{u.displayName || (u.isGuest ? 'Guest' : 'User')}</div>
-                       <div className="text-xs text-gray-500">Connected: {new Date(u.timestamp || Date.now()).toLocaleTimeString()}</div>
+                 {activeUsers.map((u: any, i: number) => (
+                   <div key={i} className="flex items-center gap-3 bg-black/40 p-2 rounded border border-green-500/20">
+                     {u.photoURL ? <img src={u.photoURL} alt="" className="w-7 h-7 rounded-full" /> : <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center text-[10px] font-bold text-white">{u.displayName?.charAt(0) || 'G'}</div>}
+                     <div className="flex-1 min-w-0">
+                       <div className="text-sm font-bold text-white truncate">{u.displayName || (u.isGuest ? 'Guest' : 'User')}</div>
+                       <div className="text-[10px] text-gray-500 flex items-center gap-2">
+                         <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                         Active now
+                       </div>
                      </div>
                      {u.isGuest ? (
                        <span className="text-[10px] bg-gray-700 text-gray-300 px-2 py-0.5 rounded font-bold">GUEST</span>
                      ) : (
-                       <span className="text-[10px] bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 font-bold">AUTHED</span>
+                       <span className="text-[10px] bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 font-bold">USER</span>
                      )}
                    </div>
                  ))}
@@ -338,7 +341,7 @@ export function Profile() {
             {/* User Premium Management */}
             <div className="bg-[#1e293b] p-4 rounded-lg border border-yellow-500/20 mt-4">
                <h4 className="font-bold mb-3 flex items-center gap-2"><Icons.Users className="w-4 h-4 text-yellow-400" /> All Users — Toggle Premium</h4>
-               <AllUsersManager />
+               <AllUsersManager activeUsers={activeUsers} />
             </div>
            </div>
          )}
@@ -389,7 +392,7 @@ function PremiumRequestsManager() {
   );
 }
 
-function AllUsersManager() {
+function AllUsersManager({ activeUsers }: { activeUsers: any[] }) {
   const { addNotification } = useOS();
   const [allUsers, setAllUsers] = useState<any[]>([]);
 
@@ -403,6 +406,8 @@ function AllUsersManager() {
     return () => unsub();
   }, []);
 
+  const activeUids = new Set(activeUsers.map((u: any) => u.uid || u.email));
+
   const togglePremium = async (uid: string, current: boolean) => {
     await update(ref(db, `users/${uid}`), { isPremium: !current });
     addNotification({ title: 'Premium', message: `${!current ? 'Activated' : 'Deactivated'} for user`, icon: 'Crown' });
@@ -410,17 +415,27 @@ function AllUsersManager() {
 
   return (
     <div className="space-y-2 max-h-60 overflow-y-auto">
-      {allUsers.length === 0 ? <p className="text-sm text-gray-500 text-center py-3">No users yet</p> : allUsers.map(u => (
+      <div className="text-[11px] text-gray-500 mb-2 flex items-center gap-4">
+        <span><span className="w-2 h-2 rounded-full bg-green-500 inline-block mr-1" /> Online: {allUsers.filter(u => activeUids.has(u.uid)).length}</span>
+        <span><span className="w-2 h-2 rounded-full bg-gray-600 inline-block mr-1" /> Offline: {allUsers.filter(u => !activeUids.has(u.uid)).length}</span>
+      </div>
+      {allUsers.length === 0 ? <p className="text-sm text-gray-500 text-center py-3">No users yet</p> : allUsers.map(u => {
+        const isOnline = activeUids.has(u.uid);
+        return (
         <div key={u.uid} className="flex items-center gap-3 bg-black/40 p-2.5 rounded border border-white/5">
+          <span className={`relative flex w-2 h-2 shrink-0 ${isOnline ? 'text-green-500' : 'text-gray-600'}`}>
+            <span className={`${isOnline ? 'animate-ping bg-green-400' : ''} absolute inline-flex h-full w-full rounded-full opacity-75`} />
+            <span className={`relative inline-flex rounded-full w-2 h-2 ${isOnline ? 'bg-green-500' : 'bg-gray-600'}`} />
+          </span>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-bold truncate">{u.displayName || u.email || u.uid}</div>
-            <div className="text-[10px] text-gray-500 truncate">{u.email || 'No email'}</div>
+            <div className="text-[10px] text-gray-500 truncate">{u.email || 'No email'} {isOnline && <span className="text-green-400 font-bold ml-1">● Online</span>}</div>
           </div>
-          <button onClick={() => togglePremium(u.uid, u.isPremium === true)} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${u.isPremium ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700 text-gray-400'}`}>
+          <button onClick={() => togglePremium(u.uid, u.isPremium === true)} className={`px-3 py-1.5 rounded text-xs font-bold transition-all whitespace-nowrap ${u.isPremium ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}>
             {u.isPremium ? <><Icons.Crown className="w-3 h-3 inline mr-1" /> Premium</> : 'Set Premium'}
           </button>
         </div>
-      ))}
+      );})}
     </div>
   );
 }
