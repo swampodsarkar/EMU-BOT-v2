@@ -628,10 +628,14 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     setCustomGames(prev => [...prev, game]);
     addNotification({ title: 'Admin', icon: 'ShieldAlert', message: `${game.title} added!` });
     try {
-      await set(ref(db, `system/customGames/${game.id}`), game);
+      const url = `https://free-fire-kingdom-default-rtdb.asia-southeast1.firebasedatabase.app/system/customGames/${game.id}.json`;
+      const res = await fetch(url, { method: 'PUT', body: JSON.stringify(game) });
+      if (!res.ok) {
+        const txt = await res.text();
+        addNotification({ title: 'Firebase Error', icon: 'X', message: `HTTP ${res.status}: ${txt.slice(0, 80)}` });
+      }
     } catch (e: any) {
-      console.error('Firebase write failed:', e);
-      addNotification({ title: 'Error', icon: 'X', message: 'Firebase write failed' });
+      addNotification({ title: 'Firebase Error', icon: 'X', message: e?.message || 'Network error' });
     }
   };
 
