@@ -15,12 +15,17 @@ import { Rewards } from '../apps/Rewards';
 import { Social } from '../apps/Social';
 import { VoiceRoomAgora } from '../apps/VoiceRoomAgora';
 import { PremiumPurchase } from '../apps/PremiumPurchase';
+import { SteamStore } from '../apps/SteamStore';
+import { EpicStore } from '../apps/EpicStore';
+import { ThisPC } from '../apps/ThisPC';
 import { Window } from './Window';
 import { motion, AnimatePresence } from 'motion/react';
 
 const DESKTOP_SHORTCUTS: AppConfig[] = [
   { id: 'library', name: 'My Games', icon: 'Gamepad2' },
-  { id: 'store', name: 'Game Store', icon: 'ShoppingCart' },
+  { id: 'steamstore', name: 'Steam', icon: 'Gamepad2' },
+  { id: 'epicstore', name: 'Epic Games', icon: 'Gift' },
+  { id: 'thispc', name: 'This PC', icon: 'Monitor' },
   { id: 'emulator', name: 'Emulator', icon: 'MonitorPlay' },
   { id: 'wallet', name: 'Wallet', icon: 'Coins' },
   { id: 'ads', name: 'Watch Ads', icon: 'PlaySquare' },
@@ -30,6 +35,7 @@ const DESKTOP_SHORTCUTS: AppConfig[] = [
   { id: 'social', name: 'Social Hub', icon: 'MessageCircle' },
   { id: 'voice', name: 'Voice Rooms', icon: 'Headphones' },
   { id: 'premium', name: 'Premium', icon: 'Crown' },
+  { id: 'store', name: 'Time Shop', icon: 'ShoppingCart' },
   { id: 'settings', name: 'Settings', icon: 'Settings' }
 ];
 
@@ -74,6 +80,9 @@ export function Desktop() {
       case 'voice': return <VoiceRoomAgora roomCode={props?.roomCode} />;
       case 'premium': return <PremiumPurchase />;
       case 'emulator': return <Emulator game={props?.game} />;
+      case 'steamstore': return <SteamStore />;
+      case 'epicstore': return <EpicStore />;
+      case 'thispc': return <ThisPC />;
       default: return <div className="p-4 text-white">App not found</div>;
     }
   };
@@ -91,6 +100,9 @@ export function Desktop() {
       case 'voice': return { w: 500, h: 600 };
       case 'premium': return { w: 450, h: 650 };
       case 'rewards': return { w: 500, h: 550 };
+      case 'steamstore': return { w: 750, h: 600 };
+      case 'epicstore': return { w: 750, h: 600 };
+      case 'thispc': return { w: 650, h: 550 };
       default: return { w: 700, h: 500 };
     }
   };
@@ -109,6 +121,9 @@ export function Desktop() {
       case 'premium': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23F59E0B' d='M24,4l5.5,11.2L42,17.3l-9,8.8l2.1,12.3L24,33.5L12.9,38.4L15,26.1L6,17.3l12.5-2.1L24,4z'/%3E%3Cpath fill='%23FFF' d='M24,8.5l3.8,7.7l0.5,1l1.1,0.2l8.6,1.4l-6.2,6.1l-0.8,0.8l0.2,1.1l1.5,8.5l-7.7-4l-1-0.5l-1,0.5l-7.7,4l1.5-8.5l0.2-1.1l-0.8-0.8L9.9,19l8.6-1.4l1.1-0.2l0.5-1L24,8.5z'/%3E%3C/svg%3E";
       case 'emulator': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23673AB7' d='M42,10H6c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h36c2.2,0,4-1.8,4-4V14C46,11.8,44.2,10,42,10z'/%3E%3Cpath fill='%23FFF' d='M12,24h8M16,20v8M30,22a2,2,0,1,0,0,4,2,2,0,1,0,0-4zM36,22a2,2,0,1,0,0,4,2,2,0,1,0,0-4z' stroke='%23FFF' stroke-width='2'/%3E%3C/svg%3E";
       case 'settings': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23607D8B' d='M43.6,27.1l-3.3-1c-0.2-0.8-0.6-1.5-1.1-2.2l1.6-3c0.4-0.8,0.3-1.8-0.3-2.5l-2.4-2.4c-0.6-0.6-1.6-0.7-2.5-0.3 l-3,1.6c-0.6-0.4-1.3-0.8-2.1-1.1l-1-3.3c-0.3-0.9-1.1-1.5-2.1-1.5h-3.4c-1,0-1.8,0.6-2.1,1.5l-1,3.3c-0.8,0.3-1.5,0.7-2.2,1.1 l-3-1.6c-0.8-0.4-1.8-0.3-2.5,0.3l-2.4,2.4c-0.6,0.6-0.7,1.6-0.3,2.5l1.6,3c-0.4,0.6-0.8,1.4-1.1,2.2l-3.3,1 c-0.9,0.3-1.5,1.1-1.5,2.1v3.4c0,1,0.6,1.8,1.5,2.1l3.3,1c0.3,0.8,0.6,1.5,1.1,2.2l-1.6,3c-0.4,0.8-0.3,1.8,0.3,2.5l2.4,2.4 c0.6,0.6,1.6,0.7,2.5,0.3l3-1.6c0.6,0.4,1.4,0.8,2.2,1.1l1,3.3c0.3,0.9,1.1,1.5,2.1,1.5h3.4c1,0,1.8-0.6,2.1-1.5l1-3.3 c0.8-0.3,1.5-0.7,2.1-1.1l3,1.6c0.8,0.4,1.8,0.3,2.5-0.3l2.4-2.4c0.6-0.6,0.7-1.6,0.3-2.5l-1.6-3c0.4-0.6,0.8-1.3,1.1-2.2l3.3-1 c0.9-0.3,1.5-1.1,1.5-2.1v-3.4C45.1,28.2,44.5,27.4,43.6,27.1z M24,31c-3.9,0-7-3.1-7-7s3.1-7,7-7s7,3.1,7,7S27.9,31,24,31z'/%3E%3C/svg%3E";
+      case 'steamstore': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='sg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231b2838'/%3E%3Cstop offset='100%25' stop-color='%230d1b2a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='10' fill='url(%23sg)'/%3E%3Cpath fill='%23ffffff' d='M24,8C15.164,8,8,15.164,8,24c0,3.975,1.514,7.607,4.004,10.329l2.003-1.159C12.515,30.498,11,27.394,11,24 c0-7.18,5.82-13,13-13s13,5.82,13,13s-5.82,13-13,13c-2.916,0-5.601-0.962-7.745-2.575l-1.998,1.156 C16.66,36.768,20.168,38,24,38c7.732,0,14-6.268,14-14S31.732,8,24,8z'/%3E%3Ccircle fill='%234a90d9' cx='24' cy='24' r='10'/%3E%3Cpath fill='%23ffffff' d='M20.5,19c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5s1.5-0.672,1.5-1.5S21.328,19,20.5,19z M27.5,19 c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5s1.5-0.672,1.5-1.5S28.328,19,27.5,19z M24,30c-3.314,0-6-2.686-6-6h12 C30,27.314,27.314,30,24,30z'/%3E%3C/svg%3E";
+      case 'epicstore': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='eg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%234a154b'/%3E%3Cstop offset='100%25' stop-color='%2322092a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='10' fill='url(%23eg)'/%3E%3Cpath fill='%23ffffff' d='M37.5,14h-27C9.672,14,9,14.672,9,15.5v17c0,0.828,0.672,1.5,1.5,1.5h27c0.828,0,1.5-0.672,1.5-1.5v-17 C39,14.672,38.328,14,37.5,14z'/%3E%3Cpath fill='%23a855f7' d='M18,17v14l12-7L18,17z'/%3E%3C/svg%3E";
+      case 'thispc': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='tg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231a365d'/%3E%3Cstop offset='100%25' stop-color='%230e1a2b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='48' height='48' rx='8' fill='url(%23tg)'/%3E%3Cpath fill='%2306b6d4' d='M8,12v20c0,1.105,0.895,2,2,2h12l-2,6h-4v2h16v-2h-4l-2-6h12c1.105,0,2-0.895,2-2V12c0-1.105-0.895-2-2-2H10 C8.895,10,8,10.895,8,12z'/%3E%3Cpath fill='%23ffffff' d='M12,14h24v16H12V14z'/%3E%3C/svg%3E";
       default: return null;
     }
   };

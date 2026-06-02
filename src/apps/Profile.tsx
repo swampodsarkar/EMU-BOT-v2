@@ -17,7 +17,9 @@ export function Profile() {
     romUrl: '',
     coverImage: '',
     core: 'nes',
-    price: 0
+    price: 0,
+    store: 'steam' as 'steam' | 'epic',
+    size: 100
   });
 
   const isAdmin = user?.email === 'mdswampodsarkar@gmail.com' || user?.email === 'mdswampodsarkar007@gmail.com';
@@ -54,10 +56,12 @@ export function Profile() {
       romUrl: processedUrl,
       coverImage: newGame.coverImage || 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=300&h=400&fit=crop',
       core: newGame.core as any,
-      price: finalPrice
+      price: finalPrice,
+      store: newGame.store,
+      size: Number(newGame.size) || 100
     });
     setShowAddGame(false);
-    setNewGame({ title: '', romUrl: '', coverImage: '', core: 'nes', price: 0 });
+    setNewGame({ title: '', romUrl: '', coverImage: '', core: 'nes', price: 0, store: 'steam', size: 100 });
     setPriceType('free');
   };
 
@@ -266,10 +270,19 @@ export function Profile() {
                     </button>
                  ) : (
                    <div className="space-y-3 bg-black/20 p-4 rounded mt-2 border border-green-500/20">
-                     <input type="text" placeholder="Game Title (e.g., Super Mario)" className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.title} onChange={e => setNewGame({...newGame, title: e.target.value})} />
-                     <input type="text" placeholder="ROM URL (GitHub Raw, Dropbox, or Direct Link)" className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.romUrl} onChange={e => setNewGame({...newGame, romUrl: e.target.value})} />
-                     <input type="text" placeholder="Cover Image URL (optional)" className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.coverImage} onChange={e => setNewGame({...newGame, coverImage: e.target.value})} />
-                     <div className="flex gap-4">
+                      <div className="flex gap-2">
+                        <input type="text" placeholder="Game Title (e.g., Super Mario)" className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.title} onChange={e => setNewGame({...newGame, title: e.target.value})} />
+                        <select className="w-[110px] bg-black/50 border border-white/10 rounded px-2 py-2 text-sm text-white" value={newGame.store} onChange={e => setNewGame({...newGame, store: e.target.value as any})}>
+                          <option value="steam">🟦 Steam</option>
+                          <option value="epic">🟪 Epic</option>
+                        </select>
+                      </div>
+                      <input type="text" placeholder="ROM URL (GitHub Raw, Dropbox, or Direct Link)" className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.romUrl} onChange={e => setNewGame({...newGame, romUrl: e.target.value})} />
+                      <div className="flex gap-2">
+                        <input type="text" placeholder="Cover Image URL (optional)" className="flex-[3] bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.coverImage} onChange={e => setNewGame({...newGame, coverImage: e.target.value})} />
+                        <input type="number" min="1" placeholder="Size MB" className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 text-sm text-white" value={newGame.size || ''} onChange={e => setNewGame({...newGame, size: Math.max(1, Number(e.target.value))})} />
+                      </div>
+                      <div className="flex gap-4">
                        <select className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 text-sm text-white" value={newGame.core} onChange={e => setNewGame({...newGame, core: e.target.value})}>
                          <option value="nes">NES</option>
                          <option value="snes">SNES</option>

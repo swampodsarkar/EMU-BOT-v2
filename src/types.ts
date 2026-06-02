@@ -5,9 +5,18 @@ export interface Game {
   price: number;
   coverImage: string;
   romUrl?: string;
+  store?: 'steam' | 'epic';
+  size?: number;
 }
 
-export type AppId = 'library' | 'wallet' | 'ads' | 'store' | 'settings' | 'emulator' | 'leaderboard' | 'profile' | 'rewards' | 'social' | 'voice' | 'premium';
+export interface StorageDrive {
+  label: string;
+  used: number;
+  total: number;
+  type: string;
+}
+
+export type AppId = 'library' | 'wallet' | 'ads' | 'store' | 'settings' | 'emulator' | 'leaderboard' | 'profile' | 'rewards' | 'social' | 'voice' | 'premium' | 'steamstore' | 'epicstore' | 'thispc';
 
 export interface AppConfig {
   id: AppId;

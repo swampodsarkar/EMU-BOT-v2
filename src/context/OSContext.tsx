@@ -69,6 +69,11 @@ interface OSState {
   claimDailyFreeTime: () => void;
   isPremium: boolean;
   friends: FriendProfile[];
+  installedGames: string[];
+  storageUsed: number;
+  maxStorage: number;
+  installGame: (gameId: string) => void;
+  uninstallGame: (gameId: string) => void;
 }
 
 const OSContext = createContext<OSState | undefined>(undefined);
@@ -172,6 +177,23 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
   const isPremiumUser = isPremium;
   const games = customGames;
   const [friends, setFriends] = useState<FriendProfile[]>([]);
+  const [installedGames, setInstalledGames] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('os_installed') || '[]'); } catch { return []; }
+  });
+
+  const maxStorage = user?.isPremium ? 100000 : 5000;
+  const storageUsed = installedGames.reduce((total, id) => {
+    const g = games.find(gg => gg.id === id);
+    return total + (g?.size || 0);
+  }, 0);
+
+  const installGame = (gameId: string) => {
+    setInstalledGames(prev => prev.includes(gameId) ? prev : [...prev, gameId]);
+  };
+
+  const uninstallGame = (gameId: string) => {
+    setInstalledGames(prev => prev.filter(id => id !== gameId));
+  };
 
   // Global listeners
   useEffect(() => {
@@ -376,6 +398,10 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('os_recent_games', JSON.stringify(recentGames));
   }, [recentGames]);
+
+  useEffect(() => {
+    localStorage.setItem('os_installed', JSON.stringify(installedGames));
+  }, [installedGames]);
 
   const openApp = (appId: AppId, props?: any) => {
     if (appId === 'emulator' && props?.game) {
@@ -612,7 +638,12 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       buyTimePack,
       claimDailyFreeTime,
       isPremium: isPremiumUser,
-      friends
+      friends,
+      installedGames,
+      storageUsed,
+      maxStorage,
+      installGame,
+      uninstallGame
     }}>
       {children}
     </OSContext.Provider>
@@ -639,6 +670,9 @@ function getAppTitle(appId: AppId, props?: any) {
     case 'profile': return 'Social Profile';
     case 'rewards': return 'Rewards Center';
     case 'emulator': return props?.game?.title ? `Playing: ${props.game.title}` : 'Emulator';
+    case 'steamstore': return 'Steam Store';
+    case 'epicstore': return 'Epic Games Store';
+    case 'thispc': return 'This PC';
     default: return 'App';
   }
 }
@@ -657,6 +691,9 @@ function getAppIcon(appId: AppId) {
     case 'profile': return 'UserCircle';
     case 'rewards': return 'Gift';
     case 'emulator': return 'MonitorPlay';
+    case 'steamstore': return 'Steam';
+    case 'epicstore': return 'Gift';
+    case 'thispc': return 'Monitor';
     default: return 'Box';
   }
 }
