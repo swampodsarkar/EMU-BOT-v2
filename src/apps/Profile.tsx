@@ -32,42 +32,47 @@ export function Profile() {
   };
 
   const handleAddGame = async () => {
-    if (!newGame.title?.trim() || !newGame.romUrl?.trim()) {
-      addNotification({ title: 'Error', message: 'Title & ROM URL required', icon: 'X' });
-      return;
-    }
-    
-    let processedUrl = newGame.romUrl.trim();
-    
-    // Dropbox conversion
-    if (processedUrl.includes('dropbox.com')) {
-      processedUrl = processedUrl
-        .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
-        .replace(/[?&]dl=[01]/g, '');
-    }
-    
-    // GitHub conversion
-    if (processedUrl.includes('github.com') && processedUrl.includes('/blob/')) {
-      processedUrl = processedUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-    }
+    try {
+      if (!newGame.title?.trim() || !newGame.romUrl?.trim()) {
+        addNotification({ title: 'Error', message: 'Title & ROM URL required', icon: 'X' });
+        return;
+      }
+      
+      let processedUrl = newGame.romUrl.trim();
+      
+      if (processedUrl.includes('dropbox.com')) {
+        processedUrl = processedUrl
+          .replace('www.dropbox.com', 'dl.dropboxusercontent.com')
+          .replace(/[?&]dl=[01]/g, '');
+      }
+      
+      if (processedUrl.includes('github.com') && processedUrl.includes('/blob/')) {
+        processedUrl = processedUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+      }
 
-    const finalPrice = priceType === 'free' ? 0 : Number(newGame.price);
-    const store = newGame.store || 'steam';
-    const size = Math.max(1, Number(newGame.size)) || 100;
+      const finalPrice = priceType === 'free' ? 0 : Number(newGame.price);
+      const store = newGame.store || 'steam';
+      const size = Math.max(1, Number(newGame.size)) || 100;
 
-    await addCustomGame({
-      id: `custom-${Date.now()}`,
-      title: newGame.title.trim(),
-      romUrl: processedUrl,
-      coverImage: newGame.coverImage?.trim() || 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=300&h=400&fit=crop',
-      core: newGame.core as any,
-      price: finalPrice,
-      store,
-      size
-    });
-    setShowAddGame(false);
-    setNewGame({ title: '', romUrl: '', coverImage: '', core: 'nes', price: 0, store: 'steam', size: 100 });
-    setPriceType('free');
+      addNotification({ title: 'Saving', message: 'Adding game to store...', icon: 'Loader' });
+      
+      await addCustomGame({
+        id: `custom-${Date.now()}`,
+        title: newGame.title.trim(),
+        romUrl: processedUrl,
+        coverImage: newGame.coverImage?.trim() || 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=300&h=400&fit=crop',
+        core: newGame.core as any,
+        price: finalPrice,
+        store,
+        size
+      });
+      setShowAddGame(false);
+      setNewGame({ title: '', romUrl: '', coverImage: '', core: 'nes', price: 0, store: 'steam', size: 100 });
+      setPriceType('free');
+      addNotification({ title: 'Success', message: 'Game added! Check Steam/Epic store', icon: 'CheckCircle' });
+    } catch (e: any) {
+      addNotification({ title: 'Error', message: e?.message || 'Failed to add game', icon: 'X' });
+    }
   };
 
   return (

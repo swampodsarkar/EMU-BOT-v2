@@ -619,15 +619,15 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addCustomGame = async (game: Game) => {
-    if (!isAdmin) return;
+    if (!isAdmin) { addNotification({ title: 'Error', icon: 'X', message: 'Admin access required' }); return; }
     try {
       const newGameRef = ref(db, `system/customGames/${game.id}`);
       await set(newGameRef, game);
       setCustomGames(prev => [...prev, game]);
-      addNotification({ title: 'Admin', message: 'Game added successfully', icon: 'ShieldAlert' });
+      addNotification({ title: 'Admin', icon: 'ShieldAlert', message: 'Game added successfully' });
     } catch (e) {
       console.error(e);
-      addNotification({ title: 'Error', message: 'Failed to add game', icon: 'X' });
+      addNotification({ title: 'Error', icon: 'X', message: 'Failed to add game' });
     }
   };
 
