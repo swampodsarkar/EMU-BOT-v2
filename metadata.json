@@ -1,0 +1,8 @@
+{
+  "name": "EMU bot",
+  "description": "A Windows OS-style Retro Gaming Emulator Web App with a wallet, ads reward system, and game library.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --os-bg: #111827;
+    --os-text: #f3f4f6;
+    --os-accent: #06b6d4;
+  }
+
+  .theme-neon {
+    --os-bg: #0f0a1c;
+    --os-text: #e0dced;
+    --os-accent: #ff00ff;
+  }
+  
+  .theme-light {
+    --os-bg: #e5e7eb;
+    --os-text: #1f2937;
+    --os-accent: #3b82f6;
+  }
+
+  input, textarea, select {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    cursor: text;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  @keyframes drift {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(10px, -10px) rotate(90deg); }
+    50% { transform: translate(-5px, -15px) rotate(180deg); }
+    75% { transform: translate(15px, -5px) rotate(270deg); }
+    100% { transform: translate(0, 0) rotate(360deg); }
+  }
+}
+
+.animate-scanline {
+  animation: scanline 8s linear infinite;
+}
+
+.hover\:pause:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@layer utilities {
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+}

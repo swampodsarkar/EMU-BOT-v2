@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EMU bot</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    <link rel="manifest" href="/manifest.json" />
+    <script>
+      // World Class Security Configuration
+      
+      // 1. Disable Right Click except on Text Input elements to allow standard Copy/Paste context menu
+      document.addEventListener('contextmenu', event => {
+        const tag = event.target.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target.isContentEditable) {
+          return;
+        }
+        event.preventDefault();
+      });
+      
+      // 2. Disable Keyboard Shortcuts (F12, Ctrl+Shift+I, Ctrl+U, Ctrl+P) - standard Copy/Paste (Ctrl+C/V/X) is allowed
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'F12' || 
+           (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J' || event.key === 'C')) || 
+           (event.ctrlKey && (event.key === 'U' || event.key === 'P' || event.key === 'S'))) {
+          event.preventDefault();
+        }
+      });
+
+      // 4. Disable Console output to prevent reverse engineering
+      // const noop = () => {};
+      // window.console.log = noop;
+      // window.console.warn = noop;
+      // window.console.error = noop;
+      // window.console.info = noop;
+      // window.console.debug = noop;
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('SW registration failed: ', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+
