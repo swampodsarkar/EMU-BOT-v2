@@ -107,6 +107,22 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
   });
   const [globalBroadcast, setGlobalBroadcast] = useState<{ message: string, timestamp: number } | null>(null);
 
+  // Tamper detection
+  useEffect(() => {
+    if (!import.meta.env.PROD) return;
+    const interval = setInterval(() => {
+      const start = performance.now();
+      (function() { debugger; })();
+      if (performance.now() - start > 200) {
+        const el = document.createElement('div');
+        el.style.cssText = 'position:fixed;inset:0;z-index:999999;background:#000;display:flex;align-items:center;justify-content:center;color:red;font-size:24px;font-family:monospace';
+        el.textContent = 'INTEGRITY CHECK FAILED';
+        document.body.appendChild(el);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const [playTimeRemaining, setPlayTimeRemaining] = useState(() => {
     try {
       const saved = localStorage.getItem('os_playTime');

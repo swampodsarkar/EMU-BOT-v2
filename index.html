@@ -3,46 +3,150 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' https://apis.google.com https://www.googleapis.com 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: blob: https:;
+      font-src 'self' data: https://fonts.gstatic.com;
+      connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://*.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com https://dl.dropboxusercontent.com https://*.dropbox.com https://raw.githubusercontent.com https://images.unsplash.com;
+      frame-src 'self' https:;
+      media-src 'self' blob: https:;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+    ">
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="EMU Bot - Web-Based Retro Gaming Emulator OS" />
+    <meta name="theme-color" content="#0a0a1a" />
     <title>EMU bot</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
     <link rel="manifest" href="/manifest.json" />
     <script>
-      // World Class Security Configuration
-      
-      // 1. Disable Right Click except on Text Input elements to allow standard Copy/Paste context menu
-      document.addEventListener('contextmenu', event => {
-        const tag = event.target.tagName;
-        if (tag === 'INPUT' || tag === 'TEXTAREA' || event.target.isContentEditable) {
-          return;
-        }
-        event.preventDefault();
-      });
-      
-      // 2. Disable Keyboard Shortcuts (F12, Ctrl+Shift+I, Ctrl+U, Ctrl+P) - standard Copy/Paste (Ctrl+C/V/X) is allowed
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'F12' || 
-           (event.ctrlKey && event.shiftKey && (event.key === 'I' || event.key === 'J' || event.key === 'C')) || 
-           (event.ctrlKey && (event.key === 'U' || event.key === 'P' || event.key === 'S'))) {
-          event.preventDefault();
-        }
-      });
+      (function() {
+        try {
+          // ==================== LAYER 1: Context Menu Block ====================
+          document.addEventListener('contextmenu', function(e) {
+            var tag = e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+            e.preventDefault();
+          });
 
-      // 4. Disable Console output to prevent reverse engineering
-      // const noop = () => {};
-      // window.console.log = noop;
-      // window.console.warn = noop;
-      // window.console.error = noop;
-      // window.console.info = noop;
-      // window.console.debug = noop;
+          // ==================== LAYER 2: Keyboard Shortcuts ====================
+          document.addEventListener('keydown', function(e) {
+            // Block: F12, Ctrl+Shift+I/J/C, Ctrl+U/S/P, Ctrl+Shift+P
+            if (
+              e.key === 'F12' ||
+              (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'P')) ||
+              (e.ctrlKey && (e.key === 'U' || e.key === 'S' || e.key === 'P'))
+            ) {
+              e.preventDefault();
+              return false;
+            }
+          });
+
+          // ==================== LAYER 3: DevTools Detection ====================
+          var element = new Image();
+          var devtoolsOpen = false;
+          
+          Object.defineProperty(element, 'id', {
+            get: function() {
+              devtoolsOpen = true;
+              throw new Error('DevTools detected');
+            }
+          });
+
+          setInterval(function() {
+            devtoolsOpen = false;
+            try {
+              console.log(element);
+            } catch(e) {
+              devtoolsOpen = true;
+            }
+            
+            var widthCheck = window.outerWidth - window.innerWidth > 160;
+            var heightCheck = window.outerHeight - window.innerHeight > 160;
+            
+            if (devtoolsOpen || widthCheck || heightCheck) {
+              document.title = '\u26A0 EMU Bot';
+              document.body.style.pointerEvents = 'none';
+              document.body.style.opacity = '0';
+              setTimeout(function() {
+                document.body.style.opacity = '';
+                document.body.style.pointerEvents = '';
+                document.title = 'EMU bot';
+              }, 3000);
+              devtoolsOpen = false;
+            }
+          }, 1000);
+
+          // ==================== LAYER 4: Debugger Trap ====================
+          setInterval(function() {
+            var start = performance.now();
+            (function(){ debugger; })();
+            var end = performance.now();
+            if (end - start > 200) {
+              document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f00;font-size:24px;font-family:monospace;text-align:center;padding:20px"><div><div style="font-size:64px;margin-bottom:20px">\u26D4</div><div style="font-weight:bold">ACCESS DENIED</div><div style="font-size:14px;color:#666;margin-top:10px">Debugging tools are not allowed</div></div></div>';
+              throw new Error('Debugger detected');
+            }
+          }, 2000);
+
+          // ==================== LAYER 5: Function Protect ====================
+          var originalToString = Function.prototype.toString;
+          Function.prototype.toString = function() {
+            if (this.name === '' || this.name.startsWith('_')) {
+              return 'function() { [native code] }';
+            }
+            return originalToString.apply(this, arguments);
+          };
+
+          // ==================== LAYER 6: Select/Copy Protection ====================
+          document.addEventListener('copy', function(e) {
+            var tag = e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+            if (window.getSelection().toString().length > 100) return;
+            e.preventDefault();
+          });
+
+          document.addEventListener('selectstart', function(e) {
+            var tag = e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable) return;
+            e.preventDefault();
+          });
+
+          // ==================== LAYER 7: Console Override ====================
+          // Comment/uncomment based on debugging needs
+          // var noop = function(){};
+          // var consoleMethods = ['log','warn','error','info','debug','trace','dir','table','group','groupCollapsed','groupEnd'];
+          // consoleMethods.forEach(function(m){ window.console[m] = noop; });
+
+          // ==================== LAYER 8: Mutation Protector ====================
+          var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+              if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                for (var i = 0; i < mutation.addedNodes.length; i++) {
+                  if (mutation.addedNodes[i].nodeType === 1) {
+                    var scripts = mutation.addedNodes[i].querySelectorAll('script:not([data-legit])');
+                    scripts.forEach(function(s) { s.remove(); });
+                  }
+                }
+              }
+            });
+          });
+          observer.observe(document.documentElement, { childList: true, subtree: true });
+
+        } catch(e) {}
+      })();
     </script>
   </head>
-  <body>
+  <body style="background:#000">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(err => {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function(err) {
             console.log('SW registration failed: ', err);
           });
         });
@@ -50,4 +154,3 @@
     </script>
   </body>
 </html>
-
