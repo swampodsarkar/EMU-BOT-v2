@@ -72,31 +72,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
           Experience your favorite retro consoles directly in your browser. Powered by EmulatorJS and a full-fledged window management system to keep your game library, progress, and community all in one place.
         </p>
 
-        {/* Animated mockup */}
-        <div className="relative mb-12 w-full max-w-2xl mx-auto">
-          <div className="mx-auto w-[90%] bg-[#0a0a1a] rounded-xl border border-white/[0.06] overflow-hidden shadow-[0_0_60px_rgba(59,130,246,0.1)]">
-            {/* Window titlebar mockup */}
-            <div className="flex items-center gap-2 px-4 h-[32px] bg-gradient-to-r from-[#1a1a3a] to-[#222244] border-b border-white/[0.06]">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                <div className="w-3 h-3 rounded-full bg-green-500/60" />
-              </div>
-              <div className="flex-1 text-center text-[11px] text-gray-500 font-mono">EMU Bot OS</div>
-            </div>
-            {/* Mockup content */}
-            <div className="relative aspect-video bg-gradient-to-br from-[#0d0d24] to-[#1a0a2e] flex items-center justify-center overflow-hidden">
-              <div className="text-center">
-                <div className="text-6xl mb-4 opacity-30">🎮</div>
-                <div className="text-cyan-400/50 text-sm font-mono tracking-widest uppercase">Now Loading...</div>
-              </div>
-              {/* Scanline effect */}
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/[0.03] to-transparent bg-[length:100%_4px] animate-scanline" 
-                style={{backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.15) 3px, rgba(0,0,0,0.15) 4px)'}} 
-              />
-            </div>
-          </div>
-        </div>
+
 
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <button 
