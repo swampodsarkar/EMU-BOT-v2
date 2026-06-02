@@ -12,6 +12,7 @@ import { Emulator } from '../apps/Emulator';
 import { Leaderboard } from '../apps/Leaderboard';
 import { Profile } from '../apps/Profile';
 import { Rewards } from '../apps/Rewards';
+import { Social } from '../apps/Social';
 import { Window } from './Window';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -24,6 +25,7 @@ const DESKTOP_SHORTCUTS: AppConfig[] = [
   { id: 'leaderboard', name: 'Leaderboard', icon: 'Trophy' },
   { id: 'profile', name: 'Profile', icon: 'UserCircle' },
   { id: 'rewards', name: 'Rewards', icon: 'Gift' },
+  { id: 'social', name: 'Social Hub', icon: 'MessageCircle' },
   { id: 'settings', name: 'Settings', icon: 'Settings' }
 ];
 
@@ -64,6 +66,7 @@ export function Desktop() {
       case 'leaderboard': return <Leaderboard />;
       case 'profile': return <Profile />;
       case 'rewards': return <Rewards />;
+      case 'social': return <Social />;
       case 'emulator': return <Emulator game={props?.game} />;
       default: return <div className="p-4 text-white">App not found</div>;
     }
@@ -78,6 +81,7 @@ export function Desktop() {
       case 'settings': return { w: 400, h: 400 };
       case 'leaderboard': return { w: 450, h: 550 };
       case 'profile': return { w: 600, h: 500 };
+      case 'social': return { w: 900, h: 600 };
       case 'rewards': return { w: 500, h: 550 };
       default: return { w: 700, h: 500 };
     }
@@ -92,6 +96,7 @@ export function Desktop() {
       case 'leaderboard': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FF9800' d='M24,4L5,13v9c0,12.5,8.1,24.1,19,27c10.9-2.9,19-14.5,19-27v-9L24,4z'/%3E%3Cpath fill='%23FFF' d='M24,10l4.6,9H40l-9.1,6.8L34.1,35L24,28.2L13.9,35l3.2-9.2L8,19h11.4L24,10z'/%3E%3C/svg%3E";
       case 'profile': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%232196F3' d='M24,4C12.954,4,4,12.954,4,24s8.954,20,20,20s20-8.954,20-20S35.046,4,24,4z'/%3E%3Cpath fill='%23FFF' d='M24,10c-3.866,0-7,3.134-7,7s3.134,7,7,7s7-3.134,7-7S27.866,10,24,10z M36,36c0-4.418-5.373-8-12-8 s-12,3.582-12,8v2h24V36z'/%3E%3C/svg%3E";
       case 'rewards': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23E91E63' d='M40,14H8c-2.209,0-4,1.791-4,4v16c0,2.209,1.791,4,4,4h32c2.209,0,4-1.791,4-4V18C44,15.791,42.209,14,40,14z'/%3E%3Cpath fill='%23FFF' d='M24,14v24M16,14v24M32,14v24' stroke='%23FFF' stroke-width='4'/%3E%3Cpath fill='%23FFC107' d='M24,6c-2.2,0-4,1.8-4,4v4h8v-4C28,7.8,26.2,6,24,6z'/%3E%3C/svg%3E";
+      case 'social': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%238B5CF6' d='M24,4C12.954,4,4,12.954,4,24c0,4.5,1.5,8.7,4.1,12.1l-2.7,6.7c-0.3,0.7-0.1,1.5,0.5,2.1s1.4,0.8,2.1,0.5l6.7-2.7C16.9,44,20.4,45,24,45c11.046,0,20-8.954,20-20S35.046,4,24,4z'/%3E%3Cpath fill='%23FFF' d='M16,20c0,2.209-1.791,4-4,4s-4-1.791-4-4s1.791-4,4-4S16,17.791,16,20z M28,20c0,2.209-1.791,4-4,4s-4-1.791-4-4s1.791-4,4-4S28,17.791,28,20z M36,24c2.209,0,4-1.791,4-4s-1.791-4-4-4s-4,1.791-4,4S33.791,24,36,24z M14,32c0,5.523,4.477,10,10,10s10-4.477,10-10H14z'/%3E%3C/svg%3E";
       case 'emulator': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23673AB7' d='M42,10H6c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h36c2.2,0,4-1.8,4-4V14C46,11.8,44.2,10,42,10z'/%3E%3Cpath fill='%23FFF' d='M12,24h8M16,20v8M30,22a2,2,0,1,0,0,4,2,2,0,1,0,0-4zM36,22a2,2,0,1,0,0,4,2,2,0,1,0,0-4z' stroke='%23FFF' stroke-width='2'/%3E%3C/svg%3E";
       case 'settings': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23607D8B' d='M43.6,27.1l-3.3-1c-0.2-0.8-0.6-1.5-1.1-2.2l1.6-3c0.4-0.8,0.3-1.8-0.3-2.5l-2.4-2.4c-0.6-0.6-1.6-0.7-2.5-0.3 l-3,1.6c-0.6-0.4-1.3-0.8-2.1-1.1l-1-3.3c-0.3-0.9-1.1-1.5-2.1-1.5h-3.4c-1,0-1.8,0.6-2.1,1.5l-1,3.3c-0.8,0.3-1.5,0.7-2.2,1.1 l-3-1.6c-0.8-0.4-1.8-0.3-2.5,0.3l-2.4,2.4c-0.6,0.6-0.7,1.6-0.3,2.5l1.6,3c-0.4,0.6-0.8,1.4-1.1,2.2l-3.3,1 c-0.9,0.3-1.5,1.1-1.5,2.1v3.4c0,1,0.6,1.8,1.5,2.1l3.3,1c0.3,0.8,0.6,1.5,1.1,2.2l-1.6,3c-0.4,0.8-0.3,1.8,0.3,2.5l2.4,2.4 c0.6,0.6,1.6,0.7,2.5,0.3l3-1.6c0.6,0.4,1.4,0.8,2.2,1.1l1,3.3c0.3,0.9,1.1,1.5,2.1,1.5h3.4c1,0,1.8-0.6,2.1-1.5l1-3.3 c0.8-0.3,1.5-0.7,2.1-1.1l3,1.6c0.8,0.4,1.8,0.3,2.5-0.3l2.4-2.4c0.6-0.6,0.7-1.6,0.3-2.5l-1.6-3c0.4-0.6,0.8-1.3,1.1-2.2l3.3-1 c0.9-0.3,1.5-1.1,1.5-2.1v-3.4C45.1,28.2,44.5,27.4,43.6,27.1z M24,31c-3.9,0-7-3.1-7-7s3.1-7,7-7s7,3.1,7,7S27.9,31,24,31z'/%3E%3C/svg%3E";
       default: return null;

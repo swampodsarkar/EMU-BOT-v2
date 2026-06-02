@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { WindowState, AppId, Game, OSNotification } from '../types';
+import { WindowState, AppId, Game, OSNotification, FriendProfile } from '../types';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { signInWithPopup, signOut, User, onAuthStateChanged } from 'firebase/auth';
 import { ref, onValue, set, update, get, onDisconnect, increment } from 'firebase/database';
@@ -66,6 +66,8 @@ interface OSState {
   addCustomGame: (game: Game) => Promise<void>;
   buyTimePack: (seconds: number, cost: number) => boolean;
   claimDailyFreeTime: () => void;
+  isPremium: boolean;
+  friends: FriendProfile[];
 }
 
 const OSContext = createContext<OSState | undefined>(undefined);
@@ -165,7 +167,9 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
   }, [playTimeRemaining]);
 
   const isAdmin = user?.email === 'mdswampodsarkar@gmail.com' || user?.email === 'mdswampodsarkar007@gmail.com';
+  const isPremium = user !== null;
   const games = customGames;
+  const [friends, setFriends] = useState<FriendProfile[]>([]);
 
   // Global listeners
   useEffect(() => {
@@ -207,6 +211,22 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       setActiveUsers(Object.values(data));
     });
 
+    // Friend list listener
+    const friendsRef = ref(db, 'social/friends');
+    const unsubFriends = onValue(friendsRef, (snap) => {
+      const data = snap.val();
+      if (data) {
+        const all: FriendProfile[] = [];
+        Object.keys(data).forEach(uid => {
+          const p = data[uid];
+          if (p && p.displayName) {
+            all.push({ uid, displayName: p.displayName, photoURL: p.photoURL, status: p.status || 'offline', currentGame: p.currentGame, lastSeen: p.lastSeen, isPremium: p.isPremium });
+          }
+        });
+        setFriends(all);
+      }
+    });
+
     // Tracking the current user's presence explicitly!
     let sessionRef: any;
     const connectRef = ref(db, '.info/connected');
@@ -237,6 +257,7 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       unsubStats();
       unsubPresence();
       unsubConnect();
+      unsubFriends();
     };
   }, []);
 
@@ -570,7 +591,9 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       canClaimFreeTime,
       timePacks,
       buyTimePack,
-      claimDailyFreeTime
+      claimDailyFreeTime,
+      isPremium,
+      friends
     }}>
       {children}
     </OSContext.Provider>
@@ -591,6 +614,7 @@ function getAppTitle(appId: AppId, props?: any) {
     case 'store': return 'Store';
     case 'settings': return 'Settings';
     case 'leaderboard': return 'Leaderboard';
+    case 'social': return 'Social Hub';
     case 'profile': return 'Social Profile';
     case 'rewards': return 'Rewards Center';
     case 'emulator': return props?.game?.title ? `Playing: ${props.game.title}` : 'Emulator';
@@ -606,6 +630,7 @@ function getAppIcon(appId: AppId) {
     case 'store': return 'ShoppingCart';
     case 'settings': return 'Settings';
     case 'leaderboard': return 'Trophy';
+    case 'social': return 'MessageCircle';
     case 'profile': return 'UserCircle';
     case 'rewards': return 'Gift';
     case 'emulator': return 'MonitorPlay';

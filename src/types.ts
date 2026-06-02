@@ -1,13 +1,13 @@
 export interface Game {
   id: string;
   title: string;
-  core: string; // e.g., 'nes', 'snes', 'psx', 'custom'
+  core: string;
   price: number;
   coverImage: string;
-  romUrl?: string; // Optional predefined ROM
+  romUrl?: string;
 }
 
-export type AppId = 'library' | 'wallet' | 'ads' | 'store' | 'settings' | 'emulator' | 'leaderboard' | 'profile' | 'rewards';
+export type AppId = 'library' | 'wallet' | 'ads' | 'store' | 'settings' | 'emulator' | 'leaderboard' | 'profile' | 'rewards' | 'social';
 
 export interface AppConfig {
   id: AppId;
@@ -33,4 +33,30 @@ export interface OSNotification {
   message: string;
   icon?: string;
   timestamp: number;
+}
+
+export interface FriendProfile {
+  uid: string;
+  displayName: string;
+  photoURL?: string;
+  status: 'online' | 'offline' | 'in-game';
+  currentGame?: string;
+  lastSeen?: number;
+  isPremium?: boolean;
+}
+
+export interface ChatMessage {
+  id: string;
+  from: string;
+  text: string;
+  timestamp: number;
+}
+
+export interface VoiceRoomMember {
+  uid: string;
+  displayName: string;
+  photoURL?: string;
+  micOn: boolean;
+  isSpeaking: boolean;
+  currentGame?: string;
 }
