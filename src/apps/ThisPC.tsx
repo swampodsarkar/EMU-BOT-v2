@@ -1,10 +1,12 @@
 import React from 'react';
 import { useOS } from '../context/OSContext';
+import { GameLibrary } from './GameLibrary';
 import * as Icons from 'lucide-react';
 
 export function ThisPC() {
   const { user, installedGames, games, storageUsed, maxStorage } = useOS();
   const pct = maxStorage > 0 ? Math.round((storageUsed / maxStorage) * 100) : 0;
+  const [tab, setTab] = React.useState<'storage' | 'games'>('storage');
 
   const myGames = games.filter(g => installedGames.includes(g.id));
   const free = maxStorage - storageUsed;
@@ -13,11 +15,23 @@ export function ThisPC() {
   return (
     <div className="h-full flex flex-col bg-gray-900 text-white">
       <div className="p-4 bg-gradient-to-r from-cyan-900/50 to-gray-900 border-b border-gray-700 sticky top-0 z-10">
-        <h2 className="text-xl font-bold flex items-center gap-2">
-          <Icons.Monitor className="w-6 h-6 text-cyan-400" />
-          This PC
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Icons.Monitor className="w-6 h-6 text-cyan-400" />
+            This PC
+          </h2>
+          <div className="flex gap-1 bg-black/40 rounded-lg p-1">
+            <button onClick={() => setTab('storage')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${tab === 'storage' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <Icons.HardDrive className="w-3.5 h-3.5 inline mr-1" />Storage
+            </button>
+            <button onClick={() => setTab('games')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${tab === 'games' ? 'bg-cyan-600 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <Icons.Gamepad2 className="w-3.5 h-3.5 inline mr-1" />My Games
+            </button>
+          </div>
+        </div>
       </div>
+
+      {tab === 'storage' && (
       <div className="flex-1 overflow-y-auto p-6">
         {!user && (
           <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 text-center mb-6">
@@ -83,6 +97,13 @@ export function ThisPC() {
           </div>
         </div>
       </div>
+      )}
+
+      {tab === 'games' && (
+        <div className="flex-1 overflow-hidden">
+          <GameLibrary />
+        </div>
+      )}
     </div>
   );
 }

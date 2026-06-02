@@ -3,7 +3,6 @@ import { useOS } from '../context/OSContext';
 import { Taskbar } from './Taskbar';
 import * as Icons from 'lucide-react';
 import { AppId, AppConfig } from '../types';
-import { GameLibrary } from '../apps/GameLibrary';
 import { Wallet } from '../apps/Wallet';
 import { Store } from '../apps/Store';
 import { AdsManager } from '../apps/Ads';
@@ -22,10 +21,9 @@ import { Window } from './Window';
 import { motion, AnimatePresence } from 'motion/react';
 
 const DESKTOP_SHORTCUTS: AppConfig[] = [
-  { id: 'library', name: 'My Games', icon: 'Gamepad2' },
+  { id: 'thispc', name: 'This PC', icon: 'Monitor' },
   { id: 'steamstore', name: 'Steam', icon: 'Gamepad2' },
   { id: 'epicstore', name: 'Epic Games', icon: 'Gift' },
-  { id: 'thispc', name: 'This PC', icon: 'Monitor' },
   { id: 'emulator', name: 'Emulator', icon: 'MonitorPlay' },
   { id: 'wallet', name: 'Wallet', icon: 'Coins' },
   { id: 'ads', name: 'Watch Ads', icon: 'PlaySquare' },
@@ -68,7 +66,6 @@ export function Desktop() {
 
   const renderAppContent = (appId: AppId, props: any) => {
     switch (appId) {
-      case 'library': return <GameLibrary />;
       case 'wallet': return <Wallet />;
       case 'store': return <Store />;
       case 'ads': return <AdsManager />;
@@ -109,7 +106,6 @@ export function Desktop() {
 
   const getAppIconSvg = (appId: string) => {
     switch (appId) {
-      case 'library': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FF9800' d='M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z'/%3E%3Cpath fill='%23FFF' d='M29.5,16c-1.381,0-2.5,1.119-2.5,2.5s1.119,2.5,2.5,2.5s2.5-1.119,2.5-2.5S30.881,16,29.5,16z M18.5,16 c-1.381,0-2.5,1.119-2.5,2.5s1.119,2.5,2.5,2.5s2.5-1.119,2.5-2.5S19.881,16,18.5,16z M24,34c-4.418,0-8-3.582-8-8h16 C32,30.418,28.418,34,24,34z'/%3E%3C/svg%3E";
       case 'store': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234CAF50' d='M39,12H9c-1.657,0-3,1.343-3,3v22c0,1.657,1.343,3,3,3h30c1.657,0,3-1.343,3-3V15C42,13.343,40.657,12,39,12z'/%3E%3Cpath fill='%23FFF' d='M16,15V9c0-4.418,3.582-8,8-8s8,3.582,8,8v6H16z'/%3E%3C/svg%3E";
       case 'wallet': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23FFC107' d='M4,24c0,11.045,8.955,20,20,20s20-8.955,20-20S35.045,4,24,4S4,12.955,4,24z'/%3E%3Cpath fill='%23FFF' d='M24,10c-7.732,0-14,6.268-14,14s6.268,14,14,14s14-6.268,14-14S31.732,10,24,10z'/%3E%3Ctext x='24' y='32' fill='%23FFC107' font-family='Arial' font-weight='bold' font-size='22' text-anchor='middle'%3E$%3C/text%3E%3C/svg%3E";
       case 'ads': return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23F44336' d='M42,10H6c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h36c2.2,0,4-1.8,4-4V14C46,11.8,44.2,10,42,10z'/%3E%3Cpath fill='%23FFF' d='M19,30l12-6l-12-6V30z'/%3E%3C/svg%3E";
