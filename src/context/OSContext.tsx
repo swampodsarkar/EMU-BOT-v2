@@ -167,7 +167,8 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
   }, [playTimeRemaining]);
 
   const isAdmin = user?.email === 'mdswampodsarkar@gmail.com' || user?.email === 'mdswampodsarkar007@gmail.com';
-  const isPremium = user !== null;
+  const [isPremium, setIsPremium] = useState(false);
+  const isPremiumUser = isPremium;
   const games = customGames;
   const [friends, setFriends] = useState<FriendProfile[]>([]);
 
@@ -276,6 +277,7 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
           setXp(data.xp ?? 0);
           setTotalPlayTime(data.totalPlayTime ?? 0);
           setUnlockedGames(data.unlockedGames ?? ['need-for-speed-3-psx']);
+          setIsPremium(data.isPremium === true);
         } else {
           // Initialize new user
           const newData = {
@@ -292,9 +294,12 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
           setLevel(1);
           setXp(0);
           setUnlockedGames(['need-for-speed-3-psx']);
+          setIsPremium(false);
         }
+        setIsDataLoaded(true);
       } else {
         // Offline / Guest fallback
+        setIsPremium(false);
         setCoins(parseInt(localStorage.getItem('os_coins') || '100', 10));
         setLevel(1);
         setXp(0);
@@ -592,7 +597,7 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       timePacks,
       buyTimePack,
       claimDailyFreeTime,
-      isPremium,
+      isPremium: isPremiumUser,
       friends
     }}>
       {children}
@@ -615,6 +620,8 @@ function getAppTitle(appId: AppId, props?: any) {
     case 'settings': return 'Settings';
     case 'leaderboard': return 'Leaderboard';
     case 'social': return 'Social Hub';
+    case 'voice': return 'Voice Rooms';
+    case 'premium': return 'Premium Upgrade';
     case 'profile': return 'Social Profile';
     case 'rewards': return 'Rewards Center';
     case 'emulator': return props?.game?.title ? `Playing: ${props.game.title}` : 'Emulator';
@@ -631,6 +638,8 @@ function getAppIcon(appId: AppId) {
     case 'settings': return 'Settings';
     case 'leaderboard': return 'Trophy';
     case 'social': return 'MessageCircle';
+    case 'voice': return 'Headphones';
+    case 'premium': return 'Crown';
     case 'profile': return 'UserCircle';
     case 'rewards': return 'Gift';
     case 'emulator': return 'MonitorPlay';

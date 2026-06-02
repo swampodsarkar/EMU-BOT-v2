@@ -212,20 +212,12 @@ export function Social() {
         {tab === 'voice' && (
           <div className="flex-1 p-6 overflow-y-auto">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Icons.Headphones className="w-5 h-5 text-purple-400" /> Voice Rooms</h3>
-            <p className="text-gray-400 text-sm mb-4">Create or join a voice room to hangout with friends while gaming!</p>
+            <p className="text-gray-400 text-sm mb-4">Powered by Agora.io — crystal clear voice chat with friends while gaming!</p>
             <div className="bg-gray-800/50 border border-purple-500/20 rounded-xl p-6 text-center">
-              <Icons.Mic className="w-12 h-12 text-purple-500 mx-auto mb-3" />
-              <h4 className="font-bold text-lg mb-1">Create a Voice Room</h4>
-              <p className="text-gray-400 text-sm mb-4">Get a room code, share with friends, start talking!</p>
-              <button onClick={() => {
-                const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-                addNotification({ title: 'Voice Room', message: `Room ${code} created! Share this code with friends.`, icon: 'Headphones' });
-                navigator.clipboard?.writeText(code);
-              }} className="px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold"><Icons.Plus className="w-4 h-4 inline mr-2" /> Create Room</button>
-              <div className="mt-4 flex gap-2 justify-center">
-                <input placeholder="Enter room code..." className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-sm w-48 outline-none" />
-                <button className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold text-sm">Join</button>
-              </div>
+              <Icons.Headphones className="w-12 h-12 text-purple-500 mx-auto mb-3" />
+              <h4 className="font-bold text-lg mb-1">Agora Voice Rooms</h4>
+              <p className="text-gray-400 text-sm mb-4">Create a room, share the code with friends, and start talking!</p>
+              <button onClick={() => openApp('voice')} className="px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold"><Icons.ExternalLink className="w-4 h-4 inline mr-2" /> Open Voice Rooms</button>
             </div>
           </div>
         )}

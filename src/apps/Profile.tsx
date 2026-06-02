@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOS } from '../context/OSContext';
 import * as Icons from 'lucide-react';
+import { ref, onValue, update, remove, get, set } from 'firebase/database';
+import { db } from '../lib/firebase';
 
 export function Profile() {
   const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, addCustomGame, activeUsers, totalAdClicks } = useOS();
@@ -300,12 +302,102 @@ export function Profile() {
                        <button onClick={() => setShowAddGame(false)} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded text-sm">Cancel</button>
                      </div>
                    </div>
-                 )}
-              </div>
+                  )}
+               </div>
+             </div>
+
+            {/* Premium Requests Management */}
+            <div className="bg-[#1e293b] p-4 rounded-lg border border-yellow-500/20 mt-4">
+               <h4 className="font-bold mb-3 flex items-center gap-2"><Icons.Crown className="w-4 h-4 text-yellow-400" /> Premium Requests <span className="text-xs text-gray-500 font-normal">(499 BDT)</span></h4>
+               <PremiumRequestsManager />
             </div>
+
+            {/* User Premium Management */}
+            <div className="bg-[#1e293b] p-4 rounded-lg border border-yellow-500/20 mt-4">
+               <h4 className="font-bold mb-3 flex items-center gap-2"><Icons.Users className="w-4 h-4 text-yellow-400" /> All Users — Toggle Premium</h4>
+               <AllUsersManager />
+            </div>
+           </div>
+         )}
+       </div>
+     </div>
+   );
+}
+
+function PremiumRequestsManager() {
+  const { addNotification } = useOS();
+  const [requests, setRequests] = useState<any[]>([]);
+
+  useEffect(() => {
+    const reqRef = ref(db, 'premium/requests');
+    const unsub = onValue(reqRef, snap => {
+      const data = snap.val();
+      if (data) setRequests(Object.entries(data).map(([uid, v]: any) => ({ uid, ...v })));
+      else setRequests([]);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleApprove = async (uid: string) => {
+    await update(ref(db, `users/${uid}`), { isPremium: true });
+    await remove(ref(db, `premium/requests/${uid}`));
+    addNotification({ title: 'Premium', message: `User ${uid} is now premium`, icon: 'Crown' });
+  };
+
+  const handleReject = async (uid: string) => {
+    await remove(ref(db, `premium/requests/${uid}`));
+  };
+
+  if (requests.length === 0) return <p className="text-sm text-gray-500 text-center py-3">No pending premium requests</p>;
+
+  return (
+    <div className="space-y-2 max-h-60 overflow-y-auto">
+      {requests.map(r => (
+        <div key={r.uid} className="flex items-center gap-3 bg-black/40 p-2.5 rounded border border-yellow-500/20">
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-bold truncate">{r.displayName || r.email || r.uid}</div>
+            <div className="text-[10px] text-gray-500">{r.method?.toUpperCase()} • Trx: {r.txnId} • {new Date(r.timestamp).toLocaleString()}</div>
           </div>
-        )}
-      </div>
+          <button onClick={() => handleApprove(r.uid)} className="px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded text-xs font-bold"><Icons.Check className="w-3.5 h-3.5" /> Approve</button>
+          <button onClick={() => handleReject(r.uid)} className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded text-xs font-bold">Reject</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AllUsersManager() {
+  const { addNotification } = useOS();
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+
+  useEffect(() => {
+    const usersRef = ref(db, 'users');
+    const unsub = onValue(usersRef, snap => {
+      const data = snap.val();
+      if (data) setAllUsers(Object.entries(data).map(([uid, v]: any) => ({ uid, ...v })));
+      else setAllUsers([]);
+    });
+    return () => unsub();
+  }, []);
+
+  const togglePremium = async (uid: string, current: boolean) => {
+    await update(ref(db, `users/${uid}`), { isPremium: !current });
+    addNotification({ title: 'Premium', message: `${!current ? 'Activated' : 'Deactivated'} for user`, icon: 'Crown' });
+  };
+
+  return (
+    <div className="space-y-2 max-h-60 overflow-y-auto">
+      {allUsers.length === 0 ? <p className="text-sm text-gray-500 text-center py-3">No users yet</p> : allUsers.map(u => (
+        <div key={u.uid} className="flex items-center gap-3 bg-black/40 p-2.5 rounded border border-white/5">
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-bold truncate">{u.displayName || u.email || u.uid}</div>
+            <div className="text-[10px] text-gray-500 truncate">{u.email || 'No email'}</div>
+          </div>
+          <button onClick={() => togglePremium(u.uid, u.isPremium === true)} className={`px-3 py-1.5 rounded text-xs font-bold transition-all ${u.isPremium ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700 text-gray-400'}`}>
+            {u.isPremium ? <><Icons.Crown className="w-3 h-3 inline mr-1" /> Premium</> : 'Set Premium'}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

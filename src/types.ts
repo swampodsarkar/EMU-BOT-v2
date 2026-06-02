@@ -7,7 +7,7 @@ export interface Game {
   romUrl?: string;
 }
 
-export type AppId = 'library' | 'wallet' | 'ads' | 'store' | 'settings' | 'emulator' | 'leaderboard' | 'profile' | 'rewards' | 'social';
+export type AppId = 'library' | 'wallet' | 'ads' | 'store' | 'settings' | 'emulator' | 'leaderboard' | 'profile' | 'rewards' | 'social' | 'voice' | 'premium';
 
 export interface AppConfig {
   id: AppId;
