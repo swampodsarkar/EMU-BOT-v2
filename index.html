@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' https://apis.google.com https://www.googleapis.com 'unsafe-inline';
+      script-src 'self' https://apis.google.com https://www.googleapis.com https://cdn.emulatorjs.org 'unsafe-inline';
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' data: blob: https:;
       font-src 'self' data: https://fonts.gstatic.com;
-      connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://*.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com https://dl.dropboxusercontent.com https://*.dropbox.com https://raw.githubusercontent.com https://images.unsplash.com;
-      frame-src 'self' https:;
+      connect-src 'self' https://*.firebaseio.com https://*.firebasedatabase.app https://*.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com https://dl.dropboxusercontent.com https://*.dropbox.com https://raw.githubusercontent.com https://images.unsplash.com https://cdn.emulatorjs.org;
+      frame-src 'self' blob: https:;
       media-src 'self' blob: https:;
       object-src 'none';
+      worker-src 'self' blob: https://cdn.emulatorjs.org;
       base-uri 'self';
       form-action 'self';
     ">
