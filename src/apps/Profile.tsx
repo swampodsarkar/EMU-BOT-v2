@@ -5,7 +5,7 @@ import { ref, onValue, update, remove, get, set } from 'firebase/database';
 import { db } from '../lib/firebase';
 
 export function Profile() {
-  const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, deleteCustomGame, activeUsers, totalAdClicks, games, addNotification } = useOS();
+  const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, addCustomGame, deleteCustomGame, activeUsers, totalAdClicks, games, addNotification } = useOS();
   const [activeTab, setActiveTab] = useState('profile');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   
@@ -31,7 +31,7 @@ export function Profile() {
     }
   };
 
-  const handleAddGame = async () => {
+  const handleAddGame = () => {
     try {
       if (!newGame.title?.trim() || !newGame.romUrl?.trim()) {
         addNotification({ title: 'Error', message: 'Title & ROM URL required', icon: 'X' });
@@ -54,8 +54,6 @@ export function Profile() {
       const store = newGame.store || 'steam';
       const size = Math.max(1, Number(newGame.size)) || 100;
 
-      addNotification({ title: 'Saving', message: 'Adding game to store...', icon: 'Loader' });
-
       const gameData = {
         id: `custom-${Date.now()}`,
         title: newGame.title.trim(),
@@ -67,18 +65,12 @@ export function Profile() {
         size
       };
 
-      // Write directly to Firebase with timeout
-      const writePromise = set(ref(db, `system/customGames/${gameData.id}`), gameData);
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase write timed out')), 15000));
-      await Promise.race([writePromise, timeoutPromise]);
-
-      // Success — form close + notify (Firebase onValue listener auto-updates games)
+      addCustomGame(gameData);
       setShowAddGame(false);
       setNewGame({ title: '', romUrl: '', coverImage: '', core: 'nes', price: 0, store: 'steam', size: 100 });
       setPriceType('free');
-      addNotification({ title: 'Success', message: `${gameData.title} added to ${store === 'epic' ? 'Epic Games' : 'Steam'}!`, icon: 'CheckCircle' });
     } catch (e: any) {
-      addNotification({ title: 'Error', message: e?.message || 'Failed to add game', icon: 'X' });
+      addNotification({ title: 'Error', message: e?.message || 'Unexpected error', icon: 'X' });
     }
   };
 

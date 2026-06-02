@@ -620,15 +620,14 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
 
   const addCustomGame = async (game: Game) => {
     if (!isAdmin) { addNotification({ title: 'Error', icon: 'X', message: 'Admin access required' }); return; }
-    try {
-      const newGameRef = ref(db, `system/customGames/${game.id}`);
-      await set(newGameRef, game);
-      setCustomGames(prev => [...prev, game]);
-      addNotification({ title: 'Admin', icon: 'ShieldAlert', message: 'Game added successfully' });
-    } catch (e) {
-      console.error(e);
-      addNotification({ title: 'Error', icon: 'X', message: 'Failed to add game' });
-    }
+    // Update local state FIRST — user sees immediately
+    setCustomGames(prev => [...prev, game]);
+    addNotification({ title: 'Admin', icon: 'ShieldAlert', message: `${game.title} added!` });
+    // Firebase write in background (fire-and-forget)
+    set(ref(db, `system/customGames/${game.id}`), game).catch((e: any) => {
+      console.error('Firebase write failed (data still in local state):', e);
+      addNotification({ title: 'Warning', icon: 'AlertTriangle', message: 'Saved locally, Firebase sync pending' });
+    });
   };
 
   const deleteCustomGame = async (gameId: string) => {
