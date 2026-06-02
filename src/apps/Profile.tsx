@@ -5,7 +5,7 @@ import { ref, onValue, update, remove, get, set } from 'firebase/database';
 import { db } from '../lib/firebase';
 
 export function Profile() {
-  const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, addCustomGame, deleteCustomGame, activeUsers, totalAdClicks, games } = useOS();
+  const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, addCustomGame, deleteCustomGame, activeUsers, totalAdClicks, games, addNotification } = useOS();
   const [activeTab, setActiveTab] = useState('profile');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   
@@ -31,8 +31,11 @@ export function Profile() {
     }
   };
 
-  const handleAddGame = () => {
-    if (!newGame.title || !newGame.romUrl) return;
+  const handleAddGame = async () => {
+    if (!newGame.title?.trim() || !newGame.romUrl?.trim()) {
+      addNotification({ title: 'Error', message: 'Title & ROM URL required', icon: 'X' });
+      return;
+    }
     
     let processedUrl = newGame.romUrl.trim();
     
@@ -49,16 +52,18 @@ export function Profile() {
     }
 
     const finalPrice = priceType === 'free' ? 0 : Number(newGame.price);
+    const store = newGame.store || 'steam';
+    const size = Math.max(1, Number(newGame.size)) || 100;
 
-    addCustomGame({
+    await addCustomGame({
       id: `custom-${Date.now()}`,
-      title: newGame.title,
+      title: newGame.title.trim(),
       romUrl: processedUrl,
-      coverImage: newGame.coverImage || 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=300&h=400&fit=crop',
+      coverImage: newGame.coverImage?.trim() || 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=300&h=400&fit=crop',
       core: newGame.core as any,
       price: finalPrice,
-      store: newGame.store,
-      size: Number(newGame.size) || 100
+      store,
+      size
     });
     setShowAddGame(false);
     setNewGame({ title: '', romUrl: '', coverImage: '', core: 'nes', price: 0, store: 'steam', size: 100 });
@@ -272,7 +277,7 @@ export function Profile() {
                    <div className="space-y-3 bg-black/20 p-4 rounded mt-2 border border-green-500/20">
                       <div className="flex gap-2">
                         <input type="text" placeholder="Game Title (e.g., Super Mario)" className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.title} onChange={e => setNewGame({...newGame, title: e.target.value})} />
-                        <select className="w-[110px] bg-black/50 border border-white/10 rounded px-2 py-2 text-sm text-white" value={newGame.store} onChange={e => setNewGame({...newGame, store: e.target.value as any})}>
+                        <select className="w-[110px] bg-black/50 border border-white/10 rounded px-2 py-2 text-sm text-white" value={newGame.store} onChange={e => setNewGame(prev => ({...prev, store: e.target.value as 'steam' | 'epic'}))}>
                           <option value="steam">🟦 Steam</option>
                           <option value="epic">🟪 Epic</option>
                         </select>

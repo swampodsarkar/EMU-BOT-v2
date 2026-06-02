@@ -60,7 +60,7 @@ export function EpicStore() {
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
               <Icons.Gift className="w-16 h-16 mb-4 opacity-30" />
               <p className="text-lg font-bold mb-1">No Free Games Yet</p>
-              <p className="text-sm">Admin will add free games to Epic Store soon!</p>
+              <p className="text-sm">Only games with <span className="text-purple-400 font-bold">Epic</span> store tag appear here — admin can add from Profile → Admin Panel</p>
             </div>
           )}
         </div>

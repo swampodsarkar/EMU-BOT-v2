@@ -3,8 +3,8 @@ import { useOS } from '../context/OSContext';
 import * as Icons from 'lucide-react';
 
 export function SteamStore() {
-  const { games, coins, openApp, addNotification, installGame, spendCoins } = useOS();
-  const steamGames = games.filter(g => g.store === 'steam' || !g.store);
+  const { games, coins, addNotification, installGame, spendCoins } = useOS();
+  const steamGames = games.filter(g => g.store === 'steam');
 
   return (
     <div className="h-full flex flex-col bg-gray-900 text-white">
@@ -25,8 +25,8 @@ export function SteamStore() {
               <div className="h-[140px] bg-gray-700 overflow-hidden relative">
                 {game.coverImage ? <img src={game.coverImage} alt={game.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" /> : <div className="w-full h-full flex items-center justify-center text-gray-600"><Icons.Gamepad2 className="w-12 h-12" /></div>}
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
-                <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-                  <Icons.Gamepad2 className="w-3 h-3" /> Steam
+                <div className="absolute top-2 left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                  <Icons.Gamepad2 className="w-3 h-3" /> {game.store === 'steam' ? 'Steam' : 'Game'}
                 </div>
               </div>
               <div className="p-4">
@@ -55,7 +55,7 @@ export function SteamStore() {
             <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
               <Icons.Gamepad2 className="w-16 h-16 mb-4 opacity-30" />
               <p className="text-lg font-bold mb-1">Steam Store Empty</p>
-              <p className="text-sm">Admin hasn't added Steam games yet</p>
+              <p className="text-sm">Only games with <span className="text-blue-400 font-bold">Steam</span> store tag appear here — admin can add from Profile → Admin Panel</p>
             </div>
           )}
         </div>
