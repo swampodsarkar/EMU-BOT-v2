@@ -82,7 +82,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
                 <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
                 <div className="w-3 h-3 rounded-full bg-green-500/60" />
               </div>
-              <div className="flex-1 text-center text-[11px] text-gray-500 font-mono">Emulator - PlayStation</div>
+              <div className="flex-1 text-center text-[11px] text-gray-500 font-mono">EMU Bot OS</div>
             </div>
             {/* Mockup content */}
             <div className="relative aspect-video bg-gradient-to-br from-[#0d0d24] to-[#1a0a2e] flex items-center justify-center overflow-hidden">
