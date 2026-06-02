@@ -291,9 +291,14 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     const unsubGames = onValue(gamesRef, (snap) => {
       const g = snap.val();
       if (g) {
-        setCustomGames(Object.values(g));
+        setCustomGames(prev => {
+          const fbGames = Object.values(g) as Game[];
+          const fbIds = new Set(fbGames.map(g => g.id));
+          const pending = prev.filter(g => !fbIds.has(g.id));
+          return pending.length > 0 ? [...fbGames, ...pending] : fbGames;
+        });
       } else {
-        setCustomGames([]);
+        setCustomGames(prev => prev.length > 0 ? prev : []);
       }
     });
 
@@ -620,14 +625,21 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
 
   const addCustomGame = async (game: Game) => {
     if (!isAdmin) { addNotification({ title: 'Error', icon: 'X', message: 'Admin access required' }); return; }
-    // Update local state FIRST — user sees immediately
     setCustomGames(prev => [...prev, game]);
     addNotification({ title: 'Admin', icon: 'ShieldAlert', message: `${game.title} added!` });
-    // Firebase write in background (fire-and-forget)
-    set(ref(db, `system/customGames/${game.id}`), game).catch((e: any) => {
-      console.error('Firebase write failed (data still in local state):', e);
-      addNotification({ title: 'Warning', icon: 'AlertTriangle', message: 'Saved locally, Firebase sync pending' });
-    });
+    try {
+      const writePromise = set(ref(db, `system/customGames/${game.id}`), game);
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
+      await Promise.race([writePromise, timeout]);
+    } catch (e: any) {
+      if (e?.message === 'timeout') {
+        console.warn('Firebase write timed out - data kept locally');
+        addNotification({ title: 'Warning', icon: 'AlertTriangle', message: 'Firebase sync slow - saved locally' });
+      } else {
+        console.error('Firebase write failed:', e);
+        addNotification({ title: 'Warning', icon: 'AlertTriangle', message: 'Firebase write failed - saved locally' });
+      }
+    }
   };
 
   const deleteCustomGame = async (gameId: string) => {
