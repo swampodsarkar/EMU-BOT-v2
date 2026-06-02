@@ -222,7 +222,7 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     if (!sid) return;
     clearTimeout(guestSyncRef.current);
     guestSyncRef.current = setTimeout(() => {
-      set(ref(db, `guestUsers/${sid}`), {
+      update(ref(db, `guestUsers/${sid}`), {
         displayName: 'Guest Player',
         coins,
         level,
@@ -230,7 +230,6 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
         totalPlayTime,
         unlockedGames,
         installedGames,
-        isPremium: false,
         lastSeen: Date.now()
       }).catch(() => {});
     }, 2000);
@@ -396,7 +395,8 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
             level: 1,
             xp: 0,
             totalPlayTime: 0,
-            unlockedGames: ['need-for-speed-3-psx']
+            unlockedGames: ['need-for-speed-3-psx'],
+            installedGames: []
           };
           await set(userRef, newData);
           setCoins(100);
@@ -452,10 +452,10 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     // Authenticated mode: Auto sync with cloud
     const updateTimeout = setTimeout(() => {
       const userRef = ref(db, `users/${user.uid}`);
-      update(userRef, { coins, level, xp, totalPlayTime, unlockedGames, displayName: user.displayName, photoURL: user.photoURL });
+      update(userRef, { coins, level, xp, totalPlayTime, unlockedGames, installedGames, displayName: user.displayName, photoURL: user.photoURL, lastSeen: Date.now() });
     }, 500); // Debounce
     return () => clearTimeout(updateTimeout);
-  }, [coins, level, xp, totalPlayTime, unlockedGames, user, isDataLoaded]);
+  }, [coins, level, xp, totalPlayTime, unlockedGames, installedGames, user, isDataLoaded]);
 
   const login = async () => {
     try {
