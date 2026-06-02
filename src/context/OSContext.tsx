@@ -4,10 +4,10 @@ import { auth, db, googleProvider } from '../lib/firebase';
 import { signInWithPopup, signOut, User, onAuthStateChanged } from 'firebase/auth';
 import { ref, onValue, set, update, get, onDisconnect, increment } from 'firebase/database';
 
-// Firebase connection test
-fetch('https://free-fire-kingdom-default-rtdb.asia-southeast1.firebasedatabase.app/.json?shallow=true')
-  .then(r => { if (!r.ok) alert('Firebase DB error: HTTP ' + r.status); })
-  .catch(e => alert('Firebase unreachable: ' + e.message));
+// Firebase Realtime DB connection test (write)
+fetch('https://free-fire-kingdom-default-rtdb.asia-southeast1.firebasedatabase.app/_test.json', { method: 'PUT', body: '1' })
+  .then(r => { if (!r.ok) alert('Firebase DB WRITE failed: HTTP ' + r.status); })
+  .catch(e => alert('Firebase DB unreachable: ' + e.message));
 
 
 const FREE_DAILY_SECONDS = 1800; // 30 min
