@@ -5,7 +5,7 @@ import { ref, onValue, update, remove, get, set } from 'firebase/database';
 import { db } from '../lib/firebase';
 
 export function Profile() {
-  const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, addCustomGame, activeUsers, totalAdClicks } = useOS();
+  const { user, login, logout, level, xp, totalPlayTime, unlockedGames, maintenanceMode, toggleMaintenanceMode, sendGlobalBroadcast, resetGlobalLeaderboard, addCustomGame, deleteCustomGame, activeUsers, totalAdClicks, games } = useOS();
   const [activeTab, setActiveTab] = useState('profile');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   
@@ -232,12 +232,35 @@ export function Profile() {
                  </div>
               </div>
 
-              <div className="bg-[#1e293b] p-4 rounded-lg border border-red-500/20 md:col-span-2">
-                 <h4 className="font-bold mb-2">Content Management</h4>
-                 {!showAddGame ? (
-                   <button onClick={() => setShowAddGame(true)} className="bg-green-600/20 text-green-500 hover:bg-green-600/30 border border-green-500/30 px-4 py-2 rounded text-sm font-bold flex items-center justify-center gap-2 w-full transition-colors">
-                      <Icons.Plus className="w-4 h-4" /> Add New Game
-                   </button>
+               <div className="bg-[#1e293b] p-4 rounded-lg border border-red-500/20 md:col-span-2">
+                  <h4 className="font-bold mb-2">Content Management</h4>
+
+                  {/* Existing Games List */}
+                  <div className="mb-4 space-y-2 max-h-48 overflow-y-auto">
+                    {games.length === 0 ? (
+                      <p className="text-sm text-gray-500 text-center py-3">No games added yet</p>
+                    ) : (
+                      games.map(g => (
+                        <div key={g.id} className="flex items-center gap-3 bg-black/40 p-2.5 rounded border border-white/5">
+                          <div className="w-8 h-8 rounded bg-gray-700 overflow-hidden shrink-0">
+                            {g.coverImage ? <img src={g.coverImage} alt="" className="w-full h-full object-cover" /> : <Icons.Gamepad2 className="w-4 h-4 m-2 text-gray-500" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-bold truncate">{g.title}</div>
+                            <div className="text-[10px] text-gray-500 truncate">{g.core} • {g.price > 0 ? `${g.price} coins` : 'Free'}</div>
+                          </div>
+                          <button onClick={() => deleteCustomGame(g.id)} className="p-1.5 hover:bg-red-600/20 rounded transition-colors" title="Delete game">
+                            <Icons.Trash2 className="w-4 h-4 text-red-400" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {!showAddGame ? (
+                    <button onClick={() => setShowAddGame(true)} className="bg-green-600/20 text-green-500 hover:bg-green-600/30 border border-green-500/30 px-4 py-2 rounded text-sm font-bold flex items-center justify-center gap-2 w-full transition-colors">
+                       <Icons.Plus className="w-4 h-4" /> Add New Game
+                    </button>
                  ) : (
                    <div className="space-y-3 bg-black/20 p-4 rounded mt-2 border border-green-500/20">
                      <input type="text" placeholder="Game Title (e.g., Super Mario)" className="w-full bg-black/50 border border-white/10 rounded px-3 py-2 text-sm" value={newGame.title} onChange={e => setNewGame({...newGame, title: e.target.value})} />

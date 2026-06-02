@@ -64,6 +64,7 @@ interface OSState {
   toggleMaintenanceMode: () => Promise<void>;
   resetGlobalLeaderboard: () => Promise<void>;
   addCustomGame: (game: Game) => Promise<void>;
+  deleteCustomGame: (gameId: string) => Promise<void>;
   buyTimePack: (seconds: number, cost: number) => boolean;
   claimDailyFreeTime: () => void;
   isPremium: boolean;
@@ -518,6 +519,18 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const deleteCustomGame = async (gameId: string) => {
+    if (!isAdmin) return;
+    try {
+      await set(ref(db, `system/customGames/${gameId}`), null);
+      setCustomGames(prev => prev.filter(g => g.id !== gameId));
+      addNotification({ title: 'Admin', message: 'Game deleted', icon: 'Trash2' });
+    } catch (e) {
+      console.error(e);
+      addNotification({ title: 'Error', message: 'Failed to delete game', icon: 'X' });
+    }
+  };
+
   useEffect(() => {
     localStorage.setItem('os_mission_ads', missions.ads.toString());
     localStorage.setItem('os_mission_playtime', missions.playTime.toString());
@@ -591,6 +604,7 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       toggleMaintenanceMode,
       resetGlobalLeaderboard,
       addCustomGame,
+      deleteCustomGame,
       playTimeRemaining,
       freeDailySeconds: FREE_DAILY_SECONDS,
       canClaimFreeTime,
