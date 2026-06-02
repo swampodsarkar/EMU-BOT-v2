@@ -628,17 +628,10 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
     setCustomGames(prev => [...prev, game]);
     addNotification({ title: 'Admin', icon: 'ShieldAlert', message: `${game.title} added!` });
     try {
-      const writePromise = set(ref(db, `system/customGames/${game.id}`), game);
-      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000));
-      await Promise.race([writePromise, timeout]);
+      await set(ref(db, `system/customGames/${game.id}`), game);
     } catch (e: any) {
-      if (e?.message === 'timeout') {
-        console.warn('Firebase write timed out - data kept locally');
-        addNotification({ title: 'Warning', icon: 'AlertTriangle', message: 'Firebase sync slow - saved locally' });
-      } else {
-        console.error('Firebase write failed:', e);
-        addNotification({ title: 'Warning', icon: 'AlertTriangle', message: 'Firebase write failed - saved locally' });
-      }
+      console.error('Firebase write failed:', e);
+      addNotification({ title: 'Error', icon: 'X', message: 'Firebase write failed' });
     }
   };
 
