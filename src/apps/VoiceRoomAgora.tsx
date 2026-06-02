@@ -3,7 +3,7 @@ import AgoraRTC, { IAgoraRTCClient, IMicrophoneAudioTrack } from 'agora-rtc-sdk-
 import { useOS } from '../context/OSContext';
 import * as Icons from 'lucide-react';
 
-const AGORA_APP_ID = '78e0fd577ac24263a2dcb2d9397c8bba';
+const AGORA_APP_ID = import.meta.env.VITE_AGORA_APP_ID || '78e0fd577ac24263a2dcb2d9397c8bba';
 
 interface RoomUser {
   uid: number;
