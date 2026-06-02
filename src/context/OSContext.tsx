@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { WindowState, AppId, Game, OSNotification, FriendProfile } from '../types';
 import { auth, db, googleProvider } from '../lib/firebase';
 import { signInWithPopup, signOut, User, onAuthStateChanged } from 'firebase/auth';
@@ -74,6 +74,11 @@ interface OSState {
   maxStorage: number;
   installGame: (gameId: string) => void;
   uninstallGame: (gameId: string) => void;
+  isBanned: boolean;
+  banUser: (uid: string, isGuest?: boolean) => Promise<void>;
+  unbanUser: (uid: string, isGuest?: boolean) => Promise<void>;
+  updateUserCoins: (uid: string, amount: number, isGuest?: boolean) => Promise<void>;
+  setUserPremium: (uid: string, value: boolean, isGuest?: boolean) => Promise<void>;
 }
 
 const OSContext = createContext<OSState | undefined>(undefined);
@@ -193,6 +198,87 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
 
   const uninstallGame = (gameId: string) => {
     setInstalledGames(prev => prev.filter(id => id !== gameId));
+  };
+
+  const [isBanned, setIsBanned] = useState(false);
+
+  // Ban check on mount
+  useEffect(() => {
+    const sid = localStorage.getItem('os_session_id');
+    if (!sid) return;
+    const banRef = ref(db, `system/banned/${user?.uid || sid}`);
+    const unsub = onValue(banRef, snap => {
+      setIsBanned(snap.val() === true);
+    });
+    return () => unsub();
+  }, [user]);
+
+  // Guest data sync to Firebase
+  const guestSyncRef = useRef<any>(null);
+  useEffect(() => {
+    if (user) return;
+    if (!isDataLoaded) return;
+    const sid = localStorage.getItem('os_session_id');
+    if (!sid) return;
+    clearTimeout(guestSyncRef.current);
+    guestSyncRef.current = setTimeout(() => {
+      set(ref(db, `guestUsers/${sid}`), {
+        displayName: 'Guest Player',
+        coins,
+        level,
+        xp,
+        totalPlayTime,
+        unlockedGames,
+        installedGames,
+        isPremium: false,
+        lastSeen: Date.now()
+      }).catch(() => {});
+    }, 2000);
+    return () => clearTimeout(guestSyncRef.current);
+  }, [coins, level, xp, totalPlayTime, unlockedGames, installedGames, user, isDataLoaded]);
+
+  // Load guest data from Firebase on mount
+  useEffect(() => {
+    if (user || !isDataLoaded) return;
+    const sid = localStorage.getItem('os_session_id');
+    if (!sid) return;
+    get(ref(db, `guestUsers/${sid}`)).then(snap => {
+      if (snap.exists()) {
+        const gd = snap.val();
+        setCoins(gd.coins ?? 100);
+        setLevel(gd.level ?? 1);
+        setXp(gd.xp ?? 0);
+        setTotalPlayTime(gd.totalPlayTime ?? 0);
+        setUnlockedGames(gd.unlockedGames ?? ['need-for-speed-3-psx']);
+        setInstalledGames(gd.installedGames ?? []);
+      }
+    }).catch(() => {});
+  }, [user, isDataLoaded]);
+
+  // Admin functions
+  const banUser = async (uid: string, isGuest?: boolean) => {
+    if (!isAdmin) return;
+    const path = isGuest ? `system/banned/guest_${uid}` : `system/banned/${uid}`;
+    await set(ref(db, path), true);
+    addNotification({ title: 'Admin', icon: 'ShieldAlert', message: 'User banned' });
+  };
+  const unbanUser = async (uid: string, isGuest?: boolean) => {
+    if (!isAdmin) return;
+    const path = isGuest ? `system/banned/guest_${uid}` : `system/banned/${uid}`;
+    await set(ref(db, path), null);
+    addNotification({ title: 'Admin', icon: 'ShieldAlert', message: 'User unbanned' });
+  };
+  const updateUserCoins = async (uid: string, amount: number, isGuest?: boolean) => {
+    if (!isAdmin) return;
+    const path = isGuest ? `guestUsers/${uid}` : `users/${uid}`;
+    await update(ref(db, path), { coins: increment(amount) });
+    addNotification({ title: 'Admin', icon: 'Coins', message: `${amount > 0 ? '+' : ''}${amount} coins` });
+  };
+  const setUserPremium = async (uid: string, value: boolean, isGuest?: boolean) => {
+    if (!isAdmin) return;
+    const path = isGuest ? `guestUsers/${uid}` : `users/${uid}`;
+    await update(ref(db, path), { isPremium: value });
+    addNotification({ title: 'Admin', icon: 'Crown', message: `Premium ${value ? 'ON' : 'OFF'}` });
   };
 
   // Global listeners
@@ -643,7 +729,12 @@ export function OSProvider({ children }: { children: React.ReactNode }) {
       storageUsed,
       maxStorage,
       installGame,
-      uninstallGame
+      uninstallGame,
+      isBanned,
+      banUser,
+      unbanUser,
+      updateUserCoins,
+      setUserPremium
     }}>
       {children}
     </OSContext.Provider>

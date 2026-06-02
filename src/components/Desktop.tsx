@@ -38,7 +38,7 @@ const DESKTOP_SHORTCUTS: AppConfig[] = [
 ];
 
 export function Desktop() {
-  const { windows, openApp, theme, maintenanceMode, activeUsers, recentGames, isAdmin, addNotification, globalBroadcast, notifications, removeNotification } = useOS();
+  const { windows, openApp, theme, maintenanceMode, activeUsers, recentGames, isAdmin, addNotification, globalBroadcast, notifications, removeNotification, isBanned } = useOS();
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number } | null>(null);
 
   React.useEffect(() => {
@@ -318,6 +318,17 @@ export function Desktop() {
       </div>
 
       <Taskbar />
+
+      {/* Banned Overlay */}
+      {isBanned && (
+        <div className="absolute inset-0 z-[100001] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center text-white" onContextMenu={(e) => e.stopPropagation()}>
+           <Icons.ShieldOff className="w-24 h-24 mb-6 text-red-500" />
+           <h1 className="text-4xl font-bold mb-4 tracking-wider">YOU HAVE BEEN BANNED</h1>
+           <p className="text-gray-400 text-lg max-w-md text-center">
+             Your access has been revoked by the administrator.
+           </p>
+        </div>
+      )}
 
       {/* Maintenance Mode Overlay */}
       {maintenanceMode && !isAdmin && (

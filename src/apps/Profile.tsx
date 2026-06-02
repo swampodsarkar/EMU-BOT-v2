@@ -411,47 +411,64 @@ function PremiumRequestsManager() {
 }
 
 function AllUsersManager({ activeUsers }: { activeUsers: any[] }) {
-  const { addNotification } = useOS();
+  const { addNotification, banUser, unbanUser, updateUserCoins, setUserPremium } = useOS();
   const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [guestUsers, setGuestUsers] = useState<any[]>([]);
 
   useEffect(() => {
     const usersRef = ref(db, 'users');
     const unsub = onValue(usersRef, snap => {
       const data = snap.val();
-      if (data) setAllUsers(Object.entries(data).map(([uid, v]: any) => ({ uid, ...v })));
+      if (data) setAllUsers(Object.entries(data).map(([uid, v]: any) => ({ uid, ...v, _type: 'registered' })));
       else setAllUsers([]);
     });
     return () => unsub();
   }, []);
 
-  const activeUids = new Set(activeUsers.map((u: any) => u.uid || u.email));
+  useEffect(() => {
+    const guestRef = ref(db, 'guestUsers');
+    const unsub = onValue(guestRef, snap => {
+      const data = snap.val();
+      if (data) setGuestUsers(Object.entries(data).map(([sid, v]: any) => ({ uid: sid, ...v, _type: 'guest' })));
+      else setGuestUsers([]);
+    });
+    return () => unsub();
+  }, []);
 
-  const togglePremium = async (uid: string, current: boolean) => {
-    await update(ref(db, `users/${uid}`), { isPremium: !current });
-    addNotification({ title: 'Premium', message: `${!current ? 'Activated' : 'Deactivated'} for user`, icon: 'Crown' });
-  };
+  const activeUids = new Set(activeUsers.map((u: any) => u.uid || u.email));
+  const combined = [...allUsers, ...guestUsers];
 
   return (
-    <div className="space-y-2 max-h-60 overflow-y-auto">
-      <div className="text-[11px] text-gray-500 mb-2 flex items-center gap-4">
-        <span><span className="w-2 h-2 rounded-full bg-green-500 inline-block mr-1" /> Online: {allUsers.filter(u => activeUids.has(u.uid)).length}</span>
-        <span><span className="w-2 h-2 rounded-full bg-gray-600 inline-block mr-1" /> Offline: {allUsers.filter(u => !activeUids.has(u.uid)).length}</span>
+    <div className="space-y-2 max-h-[300px] overflow-y-auto">
+      <div className="text-[11px] text-gray-500 mb-2 flex items-center gap-4 flex-wrap">
+        <span><span className="w-2 h-2 rounded-full bg-green-500 inline-block mr-1" /> Online: {combined.filter(u => activeUids.has(u.uid)).length}</span>
+        <span><span className="w-2 h-2 rounded-full bg-gray-600 inline-block mr-1" /> Offline: {combined.filter(u => !activeUids.has(u.uid)).length}</span>
+        <span className="text-blue-400">Registered: {allUsers.length}</span>
+        <span className="text-purple-400">Guest: {guestUsers.length}</span>
       </div>
-      {allUsers.length === 0 ? <p className="text-sm text-gray-500 text-center py-3">No users yet</p> : allUsers.map(u => {
+      {combined.length === 0 ? <p className="text-sm text-gray-500 text-center py-3">No users yet</p> : combined.map(u => {
         const isOnline = activeUids.has(u.uid);
+        const isGuest = u._type === 'guest';
         return (
-        <div key={u.uid} className="flex items-center gap-3 bg-black/40 p-2.5 rounded border border-white/5">
+        <div key={u.uid} className="flex items-center gap-2 bg-black/40 p-2 rounded border border-white/5 flex-wrap">
           <span className={`relative flex w-2 h-2 shrink-0 ${isOnline ? 'text-green-500' : 'text-gray-600'}`}>
             <span className={`${isOnline ? 'animate-ping bg-green-400' : ''} absolute inline-flex h-full w-full rounded-full opacity-75`} />
             <span className={`relative inline-flex rounded-full w-2 h-2 ${isOnline ? 'bg-green-500' : 'bg-gray-600'}`} />
           </span>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-bold truncate">{u.displayName || u.email || u.uid}</div>
-            <div className="text-[10px] text-gray-500 truncate">{u.email || 'No email'} {isOnline && <span className="text-green-400 font-bold ml-1">● Online</span>}</div>
+          <div className="flex-1 min-w-0 text-xs leading-tight">
+            <div className="font-bold truncate">{u.displayName || u.email || 'Guest'}</div>
+            <div className="text-[10px] text-gray-500 truncate">
+              {isGuest ? <span className="text-purple-400 font-bold">GUEST</span> : u.email || 'No email'}
+              {isOnline && <span className="text-green-400 ml-1">Online</span>}
+              {u.isPremium && <span className="text-yellow-400 ml-1">● Premium</span>}
+            </div>
           </div>
-          <button onClick={() => togglePremium(u.uid, u.isPremium === true)} className={`px-3 py-1.5 rounded text-xs font-bold transition-all whitespace-nowrap ${u.isPremium ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}>
-            {u.isPremium ? <><Icons.Crown className="w-3 h-3 inline mr-1" /> Premium</> : 'Set Premium'}
-          </button>
+          <div className="flex gap-1">
+            <button onClick={() => updateUserCoins(u.uid, 100, isGuest)} className="px-2 py-1 bg-green-700/40 hover:bg-green-700/60 text-green-400 rounded text-[10px] font-bold" title="+100 coins"><Icons.Plus className="w-3 h-3" /></button>
+            <button onClick={() => updateUserCoins(u.uid, -100, isGuest)} className="px-2 py-1 bg-red-700/40 hover:bg-red-700/60 text-red-400 rounded text-[10px] font-bold" title="-100 coins"><Icons.Minus className="w-3 h-3" /></button>
+            <button onClick={() => setUserPremium(u.uid, !u.isPremium, isGuest)} className={`px-2 py-1 rounded text-[10px] font-bold ${u.isPremium ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`} title="Toggle Premium"><Icons.Crown className="w-3 h-3" /></button>
+            <button onClick={() => { window.confirm(`Ban ${u.displayName || u.uid}?`) && banUser(u.uid, isGuest); }} className="px-2 py-1 bg-red-800/30 hover:bg-red-800/50 text-red-400 rounded text-[10px] font-bold" title="Ban"><Icons.ShieldOff className="w-3 h-3" /></button>
+          </div>
         </div>
       );})}
     </div>
